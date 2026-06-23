@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gamerdle</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f0f;color:#f0f0f0;min-height:100vh;padding:1.5rem 1rem;}
+#app{max-width:580px;margin:0 auto;}
+h1{font-size:26px;font-weight:700;text-align:center;margin-bottom:4px;letter-spacing:-0.5px;}
+.sub{font-size:13px;color:#999;text-align:center;margin-bottom:0.5rem;}
+.mode-bar{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem;}
+.mode-btn{padding:6px 16px;font-size:13px;font-weight:500;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:#999;cursor:pointer;}
+.mode-btn.active{background:#1d4ed8;border-color:#1d4ed8;color:#fff;}
+#clues-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+.clue-item{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:.75rem 1rem;}
+.clue-item.active{border-color:#3b82f6;background:#111827;}
+.clue-num{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#666;margin-bottom:4px;}
+.clue-item.active .clue-num{color:#60a5fa;}
+.clue-txt{font-size:14px;color:#e0e0e0;line-height:1.6;}
+.slots{display:flex;gap:6px;margin-bottom:1rem;}
+.slot{width:26px;height:26px;border-radius:4px;border:1px solid #333;background:#1a1a1a;}
+.slot.w{background:#7f1d1d;border-color:#991b1b;}
+.slot.c{background:#14532d;border-color:#166534;}
+.slot.s{background:#713f12;border-color:#854d0e;}
+#rows{display:flex;flex-direction:column;gap:5px;margin-bottom:.75rem;}
+.row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;font-size:13px;}
+.row.w{background:#1c0a0a;color:#f87171;border:1px solid #7f1d1d;}
+.row.c{background:#0a1c0e;color:#4ade80;border:1px solid #14532d;}
+.row.s{background:#1c150a;color:#fbbf24;border:1px solid #713f12;}
+#wrap{position:relative;}
+#inp{width:100%;padding:10px 14px;font-size:14px;border:1px solid #333;border-radius:8px;background:#1a1a1a;color:#f0f0f0;outline:none;}
+#inp:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,0.2);}
+#drop{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1a1a1a;border:1px solid #333;border-radius:8px;z-index:99;max-height:200px;overflow-y:auto;}
+.di{padding:9px 14px;font-size:13px;color:#e0e0e0;cursor:pointer;}
+.di:hover,.di.a{background:#252525;}
+.btns{display:flex;gap:8px;margin-top:8px;}
+#btn{flex:1;padding:10px;font-size:14px;font-weight:500;border-radius:8px;background:#1a1a1a;border:1px solid #333;color:#f0f0f0;cursor:pointer;}
+#btn:hover{background:#252525;}
+#btn:disabled{opacity:.4;cursor:default;}
+#skip-btn{padding:10px 18px;font-size:14px;font-weight:500;border-radius:8px;background:#1a1a1a;border:1px solid #333;color:#999;cursor:pointer;}
+#skip-btn:hover{background:#252525;}
+#skip-btn:disabled{opacity:.4;cursor:default;}
+#err{font-size:12px;color:#f87171;text-align:center;margin-top:6px;display:none;}
+#result{display:none;margin-top:1rem;border-radius:10px;overflow:hidden;border:1px solid #2a2a2a;}
+#result-top{padding:1rem 1.25rem;text-align:center;}
+#result-top.win{background:#0a1c0e;color:#4ade80;}
+#result-top.lose{background:#1c0a0a;color:#f87171;}
+#result-top p{font-size:17px;font-weight:600;margin-bottom:3px;}
+#result-top span{font-size:13px;opacity:.8;}
+#result-stats{display:flex;background:#1a1a1a;border-top:1px solid #2a2a2a;}
+.stat{flex:1;padding:.875rem;text-align:center;border-right:1px solid #2a2a2a;}
+.stat:last-child{border-right:none;}
+.stat-val{font-size:22px;font-weight:700;color:#f0f0f0;}
+.stat-label{font-size:11px;color:#666;margin-top:3px;}
+#next-btn{display:none;width:100%;margin-top:10px;padding:10px;font-size:14px;font-weight:500;border-radius:8px;background:#1d4ed8;border:none;color:#fff;cursor:pointer;}
+#next-btn:hover{background:#1e40af;}
+#no-puzzle{text-align:center;padding:3rem;color:#666;font-size:14px;}
+.infinite-badge{display:none;text-align:center;margin-bottom:1rem;}
+.infinite-badge span{background:#1d4ed8;color:#fff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;}
+#round-info{text-align:center;font-size:12px;color:#666;margin-bottom:1rem;}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Gamerdle</h1>
+  <p class="sub">Guess the video game from the clues.</p>
+  <div class="mode-bar">
+    <button class="mode-btn active" id="daily-btn" onclick="setMode('daily')">Daily</button>
+    <button class="mode-btn" id="infinite-btn" onclick="setMode('infinite')">Infinite</button>
+  </div>
+  <div class="infinite-badge" id="inf-badge"><span>∞ Infinite Mode</span></div>
+  <div id="round-info"></div>
+  <div id="game-area">
+    <div id="clues-list"></div>
+    <div class="slots" id="slots"></div>
+    <div id="rows"></div>
+    <div id="wrap"><input id="inp" type="text" placeholder="Type a game title..." autocomplete="off"/><div id="drop"></div></div>
+    <div class="btns"><button id="btn">Submit guess</button><button id="skip-btn">Skip</button></div>
+    <div id="err">Game not in list — pick from the dropdown.</div>
+    <div id="result">
+      <div id="result-top"><p id="rt"></p><span id="rs"></span></div>
+      <div id="result-stats">
+        <div class="stat"><div class="stat-val" id="s-guesses">—</div><div class="stat-label">Guesses</div></div>
+        <div class="stat"><div class="stat-val" id="s-clues">—</div><div class="stat-label">Clues seen</div></div>
+        <div class="stat"><div class="stat-val" id="s-skips">—</div><div class="stat-label">Skips</div></div>
+      </div>
+    </div>
+    <button id="next-btn" onclick="nextRound()">Next game →</button>
+  </div>
+  <div id="no-puzzle" style="display:none">No daily puzzle today. Try Infinite mode!</div>
+</div>
+<script>
+const GAMES=[
+  {id:"halo",title:"Halo",ready:true,clues:["A first-person shooter set in a vast sci-fi universe spanning multiple alien worlds and space stations.","Available on Xbox and PC, it became one of Microsoft's most iconic exclusive franchises.","Developed by Bungie, who later handed the series off to 343 Industries.","Players fight as a super-soldier in a suit of powered armor against an alien coalition called the Covenant.","The iconic theme — a Gregorian chant over sweeping orchestral music — is instantly recognizable to any gamer.","The ring-shaped megastructure the game is named after is a weapon capable of wiping out all life in the galaxy."]},
+  {id:"balatro",title:"Balatro",ready:true,clues:["A roguelike deckbuilder where the core mechanic is built entirely around a single classic card game.","Available on PC, console, and mobile — it took the indie scene by storm on release.","Developed solo by LocalThunk, a previously unknown developer who kept their identity secret for years.","Hands are scored using poker combinations, but jokers and special cards bend the rules in absurd ways.","The game is famous for enabling ridiculously broken synergies that can result in scores in the trillions.","Its name is Italian for a type of joker or trickster — fitting for a game built on bending the rules."]},
+  {id:"overwatch",title:"Overwatch",ready:true,clues:["A team-based hero shooter where each character has a unique set of abilities and a distinct role.","Released on PC, PlayStation, and Xbox, it later went free-to-play in its sequel.","Developed and published by Blizzard Entertainment, known for World of Warcraft and Diablo.","Matches are objective-based — teams push payloads, capture points, or defend positions.","The game launched with a cinematic universe of short films and comics that built out its lore.","Its cast includes a gorilla scientist, an immortal Egyptian pharaoh, and a Swedish engineer with a turret."]},
+  {id:"fortnite",title:"Fortnite",ready:true,clues:["A battle royale game where 100 players drop onto an island and fight until one player or team remains.","Available on virtually every platform including PC, console, and mobile.","Developed by Epic Games, who also created the Unreal Engine used by countless other games.","A unique building mechanic lets players construct walls, ramps, and structures mid-fight.","The game hosts massive in-game live events — including concerts by real artists like Travis Scott and Ariana Grande.","It has collaborated with what feels like every major IP in existence, from Marvel to Star Wars to the NFL."]},
+  {id:"apex",title:"Apex Legends",ready:true,clues:["A squad-based battle royale where teams of three compete to be the last team standing.","Free to play on PC, PlayStation, Xbox, and Nintendo Switch.","Developed by Respawn Entertainment, the studio behind the Titanfall series.","Each playable character — called a Legend — has a unique passive, tactical, and ultimate ability.","It was announced and released on the same day in 2019, with no prior marketing — a near-unprecedented move.","The ping communication system it introduced became so influential that dozens of other games copied it."]},
+  {id:"tetris",title:"Tetris",ready:true,clues:["One of the most recognizable puzzle games ever made, built around interlocking falling shapes.","It has appeared on virtually every gaming platform ever created, from Game Boy to modern smartphones.","Originally created by Soviet software engineer Alexey Pajitnov in 1984.","The goal is to clear horizontal lines by filling them completely — incomplete lines stack up and end the game.","The classic Game Boy version bundled with the handheld is often credited with making it a global phenomenon.","Its iconic theme, Korobeiniki, is a Russian folk song that most people can hum without knowing its name."]},
+  {id:"eldenring",title:"Elden Ring",ready:true,clues:["An open-world action RPG known for its punishing difficulty and deep, cryptic lore.","Available on PC, PlayStation, and Xbox — it released in February 2022.","Developed by FromSoftware, directed by Hidetaka Miyazaki, with world-building by George R.R. Martin.","Players explore the Lands Between, a vast realm filled with towering bosses and hidden secrets.","It became one of the fastest-selling games in history and swept nearly every Game of the Year award in 2022.","The game's lore revolves around the shattering of a golden ring and the demigods who fight over its shards."]},
+  {id:"darksouls3",title:"Dark Souls 3",ready:true,clues:["An action RPG famous for its relentless difficulty, tight combat, and atmospheric world design.","Available on PC, PlayStation 4, and Xbox One — released in 2016.","Developed by FromSoftware, the studio that pioneered the 'soulslike' genre.","Death is a core mechanic — players drop their currency on death and must retrieve it before dying again.","The game's world is filled with environmental storytelling, hidden passages, and cryptic item descriptions.","The final entry in the Dark Souls trilogy, it brings back characters and locations from the original game."]},
+  {id:"rocketleague",title:"Rocket League",ready:true,clues:["A sports game that combines soccer with rocket-powered cars in an enclosed arena.","Available on PC, PlayStation, Xbox, and Nintendo Switch — it went free-to-play in 2020.","Developed by Psyonix, who originally released a lesser-known predecessor called Supersonic Acrobatic Rocket-Powered Battle-Cars.","Players can boost, jump, and flip their cars to hit an oversized ball into the opposing team's goal.","The skill ceiling is extraordinarily high — top players perform aerial maneuvers that look physically impossible.","Despite its simple premise, it has one of the most active esports scenes of any game in the world."]},
+  {id:"mariokart",title:"Mario Kart",ready:true,clues:["A kart racing series where beloved Nintendo characters compete on themed tracks full of hazards.","A Nintendo exclusive franchise, playable on virtually every Nintendo console ever made.","Developed internally by Nintendo, with the latest mainline entry released on the Nintendo Switch.","Players collect item boxes mid-race to get power-ups — including the dreaded blue shell that targets the leader.","The series is famous for being perfectly balanced to be chaotic — last place gets the best items.","It is one of the best-selling video game franchises of all time, with over 200 million copies sold."]}
+];
+
+const DAILY_SCHEDULE={
+  "2026-06-20":"halo",
+  "2026-06-21":"balatro",
+  "2026-06-22":"eldenring",
+  "2026-06-23":"tetris",
+  "2026-06-24":"fortnite",
+  "2026-06-25":"apex",
+  "2026-06-26":"rocketleague",
+  "2026-06-27":"mariokart",
+  "2026-06-28":"overwatch",
+  "2026-06-29":"darksouls3"
+};
+
+const LIST=GAMES.map(g=>g.title);
+const GAME_MAP=Object.fromEntries(GAMES.map(g=>[g.id,g]));
+
+let mode='daily';
+let puzzle=null;
+let clueIdx=0,gc=0,skips=0,over=false,si=-1,filt=[];
+let infiniteRound=0;
+let usedInfinite=[];
+
+function getTodayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('daily-btn').classList.toggle('active',m==='daily');
+  document.getElementById('infinite-btn').classList.toggle('active',m==='infinite');
+  document.getElementById('inf-badge').style.display=m==='infinite'?'block':'none';
+  document.getElementById('next-btn').style.display='none';
+  usedInfinite=[];
+  infiniteRound=0;
+  startGame();
+}
+
+function pickInfiniteGame(){
+  const pool=GAMES.filter(g=>g.ready!==false);
+  const available=pool.filter(g=>!usedInfinite.includes(g.id));
+  if(!available.length){usedInfinite=[];return pool[Math.floor(Math.random()*pool.length)];}
+  return available[Math.floor(Math.random()*available.length)];
+}
+
+function startGame(){
+  clueIdx=0;gc=0;skips=0;over=false;si=-1;filt=[];
+  document.getElementById('clues-list').innerHTML='';
+  document.getElementById('rows').innerHTML='';
+  document.getElementById('slots').innerHTML='';
+  document.getElementById('result').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('err').style.display='none';
+  document.getElementById('inp').value='';
+  document.getElementById('inp').disabled=false;
+  document.getElementById('btn').disabled=false;
+  document.getElementById('skip-btn').disabled=false;
+  document.getElementById('no-puzzle').style.display='none';
+  document.getElementById('game-area').style.display='block';
+
+  if(mode==='daily'){
+    const key=getTodayKey();
+    const id=DAILY_SCHEDULE[key];
+    if(!id){document.getElementById('game-area').style.display='none';document.getElementById('no-puzzle').style.display='block';return;}
+    puzzle=GAME_MAP[id];
+    document.getElementById('round-info').textContent='';
+  } else {
+    infiniteRound++;
+    const g=pickInfiniteGame();
+    usedInfinite.push(g.id);
+    puzzle=g;
+    document.getElementById('round-info').textContent='Round '+infiniteRound;
+  }
+
+  for(let i=0;i<6;i++){const s=document.createElement('div');s.className='slot';s.id='s'+i;document.getElementById('slots').appendChild(s);}
+  renderClues();
+}
+
+function renderClues(){
+  const cl=document.getElementById('clues-list');
+  cl.innerHTML='';
+  for(let i=0;i<=clueIdx;i++){
+    const el=document.createElement('div');el.className='clue-item'+(i===clueIdx?' active':'');
+    const num=document.createElement('div');num.className='clue-num';num.textContent='Clue '+(i+1)+' of 6';
+    const txt=document.createElement('div');txt.className='clue-txt';txt.textContent=puzzle.clues[i];
+    el.appendChild(num);el.appendChild(txt);cl.appendChild(el);
+  }
+  cl.lastChild.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function showDrop(v){
+  const err=document.getElementById('err');err.style.display='none';
+  const drop=document.getElementById('drop');
+  if(!v.trim()){drop.style.display='none';return;}
+  filt=LIST.filter(m=>m.toLowerCase().includes(v.toLowerCase()));
+  if(!filt.length){drop.style.display='none';return;}
+  drop.innerHTML='';
+  filt.forEach(m=>{const d=document.createElement('div');d.className='di';d.textContent=m;d.addEventListener('mousedown',e=>{e.preventDefault();document.getElementById('inp').value=m;drop.style.display='none';si=-1;});drop.appendChild(d);});
+  si=-1;drop.style.display='block';
+}
+function updActive(){document.getElementById('drop').querySelectorAll('.di').forEach((el,i)=>el.classList.toggle('a',i===si));}
+
+function addRow(text,type){
+  const r=document.createElement('div');r.className='row '+type;
+  const ic=document.createElement('i');ic.className=type==='c'?'ti ti-check':type==='s'?'ti ti-player-skip-forward':'ti ti-x';
+  r.appendChild(ic);const sp=document.createElement('span');sp.textContent=text;r.appendChild(sp);
+  document.getElementById('rows').appendChild(r);
+}
+
+function endGame(won){
+  over=true;
+  document.getElementById('inp').disabled=true;
+  document.getElementById('btn').disabled=true;
+  document.getElementById('skip-btn').disabled=true;
+  document.getElementById('clues-list').querySelectorAll('.clue-item').forEach(el=>el.classList.remove('active'));
+  const top=document.getElementById('result-top');
+  top.className=won?'win':'lose';
+  document.getElementById('rt').textContent=won?'Correct! 🎉':'Better luck next time!';
+  document.getElementById('rs').textContent=won?`You got it in ${gc} guess${gc!==1?'es':''}!`:`The answer was: ${puzzle.title}`;
+  document.getElementById('s-guesses').textContent=gc;
+  document.getElementById('s-clues').textContent=clueIdx+1;
+  document.getElementById('s-skips').textContent=skips;
+  document.getElementById('result').style.display='block';
+  if(mode==='infinite')document.getElementById('next-btn').style.display='block';
+}
+
+function advance(){if(gc>=6){endGame(false);return;}if(clueIdx<5){clueIdx++;renderClues();}}
+
+function submitGuess(){
+  if(over)return;
+  const v=document.getElementById('inp').value.trim();if(!v)return;
+  const match=LIST.find(m=>m.toLowerCase()===v.toLowerCase());
+  if(!match){const err=document.getElementById('err');err.style.display='block';document.getElementById('inp').style.boxShadow='0 0 0 2px rgba(239,68,68,0.5)';setTimeout(()=>document.getElementById('inp').style.boxShadow='',700);return;}
+  gc++;const ok=match.toLowerCase()===puzzle.title.toLowerCase();
+  addRow(match,ok?'c':'w');
+  const sl=document.getElementById('s'+(gc-1));if(sl)sl.className='slot '+(ok?'c':'w');
+  document.getElementById('inp').value='';document.getElementById('drop').style.display='none';document.getElementById('err').style.display='none';
+  if(ok){endGame(true);return;}
+  advance();
+}
+
+function skipGuess(){
+  if(over)return;gc++;skips++;
+  addRow('Skipped','s');
+  const sl=document.getElementById('s'+(gc-1));if(sl)sl.className='slot s';
+  document.getElementById('inp').value='';document.getElementById('drop').style.display='none';document.getElementById('err').style.display='none';
+  advance();
+}
+
+function nextRound(){startGame();}
+
+document.getElementById('inp').addEventListener('input',()=>showDrop(document.getElementById('inp').value));
+document.getElementById('inp').addEventListener('blur',()=>setTimeout(()=>document.getElementById('drop').style.display='none',150));
+document.getElementById('inp').addEventListener('keydown',e=>{
+  const items=document.getElementById('drop').querySelectorAll('.di');
+  if(e.key==='ArrowDown'){si=Math.min(si+1,items.length-1);updActive();e.preventDefault();}
+  else if(e.key==='ArrowUp'){si=Math.max(si-1,0);updActive();e.preventDefault();}
+  else if(e.key==='Enter'){if(si>=0&&filt[si]){document.getElementById('inp').value=filt[si];document.getElementById('drop').style.display='none';si=-1;}else submitGuess();}
+});
+document.getElementById('btn').addEventListener('click',submitGuess);
+document.getElementById('skip-btn').addEventListener('click',skipGuess);
+
+startGame();
+</script>
+</body>
+</html>
