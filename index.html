@@ -94,18 +94,103 @@ h1{font-size:26px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
 </div>
 <script>
 const GAMES=[
-  {id:"halo",title:"Halo",ready:true,clues:["A first-person shooter set in a vast sci-fi universe spanning multiple alien worlds and space stations.","Available on Xbox and PC, it became one of Microsoft's most iconic exclusive franchises.","Developed by Bungie, who later handed the series off to 343 Industries.","Players fight as a super-soldier in a suit of powered armor against an alien coalition called the Covenant.","The iconic theme — a Gregorian chant over sweeping orchestral music — is instantly recognizable to any gamer.","The ring-shaped megastructure the game is named after is a weapon capable of wiping out all life in the galaxy."]},
-  {id:"balatro",title:"Balatro",ready:true,clues:["A roguelike deckbuilder where the core mechanic is built entirely around a single classic card game.","Available on PC, console, and mobile — it took the indie scene by storm on release.","Developed solo by LocalThunk, a previously unknown developer who kept their identity secret for years.","Hands are scored using poker combinations, but jokers and special cards bend the rules in absurd ways.","The game is famous for enabling ridiculously broken synergies that can result in scores in the trillions.","Its name is Italian for a type of joker or trickster — fitting for a game built on bending the rules."]},
-  {id:"overwatch",title:"Overwatch",ready:true,clues:["A team-based hero shooter where each character has a unique set of abilities and a distinct role.","Released on PC, PlayStation, and Xbox, it later went free-to-play in its sequel.","Developed and published by Blizzard Entertainment, known for World of Warcraft and Diablo.","Matches are objective-based — teams push payloads, capture points, or defend positions.","The game launched with a cinematic universe of short films and comics that built out its lore.","Its cast includes a gorilla scientist, an immortal Egyptian pharaoh, and a Swedish engineer with a turret."]},
-  {id:"fortnite",title:"Fortnite",ready:true,clues:["A battle royale game where 100 players drop onto an island and fight until one player or team remains.","Available on virtually every platform including PC, console, and mobile.","Developed by Epic Games, who also created the Unreal Engine used by countless other games.","A unique building mechanic lets players construct walls, ramps, and structures mid-fight.","The game hosts massive in-game live events — including concerts by real artists like Travis Scott and Ariana Grande.","It has collaborated with what feels like every major IP in existence, from Marvel to Star Wars to the NFL."]},
-  {id:"apex",title:"Apex Legends",ready:true,clues:["A squad-based battle royale where teams of three compete to be the last team standing.","Free to play on PC, PlayStation, Xbox, and Nintendo Switch.","Developed by Respawn Entertainment, the studio behind the Titanfall series.","Each playable character — called a Legend — has a unique passive, tactical, and ultimate ability.","It was announced and released on the same day in 2019, with no prior marketing — a near-unprecedented move.","The ping communication system it introduced became so influential that dozens of other games copied it."]},
-  {id:"tetris",title:"Tetris",ready:true,clues:["One of the most recognizable puzzle games ever made, built around interlocking falling shapes.","It has appeared on virtually every gaming platform ever created, from Game Boy to modern smartphones.","Originally created by Soviet software engineer Alexey Pajitnov in 1984.","The goal is to clear horizontal lines by filling them completely — incomplete lines stack up and end the game.","The classic Game Boy version bundled with the handheld is often credited with making it a global phenomenon.","Its iconic theme, Korobeiniki, is a Russian folk song that most people can hum without knowing its name."]},
-  {id:"eldenring",title:"Elden Ring",ready:true,clues:["An open-world action RPG known for its punishing difficulty and deep, cryptic lore.","Available on PC, PlayStation, and Xbox — it released in February 2022.","Developed by FromSoftware, directed by Hidetaka Miyazaki, with world-building by George R.R. Martin.","Players explore the Lands Between, a vast realm filled with towering bosses and hidden secrets.","It became one of the fastest-selling games in history and swept nearly every Game of the Year award in 2022.","The game's lore revolves around the shattering of a golden ring and the demigods who fight over its shards."]},
-  {id:"darksouls3",title:"Dark Souls 3",ready:true,clues:["An action RPG famous for its relentless difficulty, tight combat, and atmospheric world design.","Available on PC, PlayStation 4, and Xbox One — released in 2016.","Developed by FromSoftware, the studio that pioneered the 'soulslike' genre.","Death is a core mechanic — players drop their currency on death and must retrieve it before dying again.","The game's world is filled with environmental storytelling, hidden passages, and cryptic item descriptions.","The final entry in the Dark Souls trilogy, it brings back characters and locations from the original game."]},
-  {id:"rocketleague",title:"Rocket League",ready:true,clues:["A sports game that combines soccer with rocket-powered cars in an enclosed arena.","Available on PC, PlayStation, Xbox, and Nintendo Switch — it went free-to-play in 2020.","Developed by Psyonix, who originally released a lesser-known predecessor called Supersonic Acrobatic Rocket-Powered Battle-Cars.","Players can boost, jump, and flip their cars to hit an oversized ball into the opposing team's goal.","The skill ceiling is extraordinarily high — top players perform aerial maneuvers that look physically impossible.","Despite its simple premise, it has one of the most active esports scenes of any game in the world."]},
-  {id:"mariokart",title:"Mario Kart",ready:true,clues:["A kart racing series where beloved Nintendo characters compete on themed tracks full of hazards.","A Nintendo exclusive franchise, playable on virtually every Nintendo console ever made.","Developed internally by Nintendo, with the latest mainline entry released on the Nintendo Switch.","Players collect item boxes mid-race to get power-ups — including the dreaded blue shell that targets the leader.","The series is famous for being perfectly balanced to be chaotic — last place gets the best items.","It is one of the best-selling video game franchises of all time, with over 200 million copies sold."]},
-  {id:"cyberpunk2077",title:"Cyberpunk 2077",ready:false},
-  {id:"minecraft",title:"Minecraft",ready:false},
+  {id:"halo3",title:"Halo 3",ready:true, clues: [
+  "A sci-fi first person shooter and the conclusion of an iconic trilogy.",
+  "Released in 2007.",
+  "You play as a super-soldier fighting an alien coalition threatening humanity.",
+  "Its multiplayer introduced a theater mode letting players record and share their best moments.",
+  "Its launch was one of the biggest in entertainment history, making $170 million in its first 24 hours.",
+  "The tagline 'Finish the Fight' was plastered everywhere in one of gaming's most iconic marketing campaigns."
+]},
+  {id:"balatro",title:"Balatro",ready:true, clues: [
+  "A roguelike deckbuilder.",
+  "Released in 2024.",
+  "The scoring system is built around a single classic card game.",
+  "Special cards called jokers modify the rules in increasingly absurd and broken ways.",
+  "Players routinely achieve scores in the billions through ridiculous synergies.",
+  "Developed solo by an anonymous developer known only as LocalThunk, who had never shipped a game before."
+]},
+
+  {id:"overwatch",title:"Overwatch",ready:true, clues: [
+  "A team-based hero shooter.",
+  "Released in 2016.",
+  "Teams of six compete on objective-based maps, pushing payloads or capturing points.",
+  "Each hero has a unique ultimate ability that can completely swing the outcome of a fight.",
+  "Launched with an entire cinematic universe of short films and comics that built out its lore.",
+  "Its roster includes a gorilla scientist, an immortal Egyptian pharaoh, and a Swedish engineer with a turret."
+]},
+  {id:"fortnite",title:"Fortnite",ready:true, clues: [
+  "Features characters from Marvel, DC, Star Wars, and even Halo!",
+  "Released in 2017.",
+  "Set on an ever-shrinking island that forces players into combat.",
+  "A unique building mechanic lets players construct walls and ramps mid-fight.",
+  "Has hosted massive in-game live events including concerts by real artists like Travis Scott.",
+  "You can find items like the shockwave grenade, mini potion, the Infinity Gauntlet, and even Spiderman's web shooters ."
+]},
+  {id:"apex",title:"Apex Legends",ready:true, clues: [
+  "A squad-based battle royale where the last team standing wins.",
+  "Released in 2019.",
+  "Each playable character has a unique set of abilities.",
+  "Teams of three drop onto a shrinking map and scavenge for weapons and gear.",
+  "It was announced and released on the same day with no prior marketing.",
+  "The ping communication system it introduced was so good that dozens of other games copied it directly."
+]},
+  {id:"tetris",title:"Tetris",ready:true, clues: [
+  "One of the most recognizable games ever made.",
+  "Released in 1984.",
+  "You must arrange shapes before its too late.",
+  "Completing a full horizontal line makes it disappear.",
+  "The Game Boy version bundled with the handheld is largely credited with making it a global phenomenon.",
+  "Created by Soviet engineer Alexey Pajitnov, who didn't receive royalties from it for over a decade."
+]},
+  {id:"eldenring",title:"Elden Ring",ready:true, clues: [
+  "An open world action RPG.",
+  "Released in 2022.",
+  "Set in a vast decaying realm filled with towering bosses and hidden secrets.",
+  "You drop your currency on death and must retrieve it.",
+  "The world and lore were co-created with the author of Game of Thrones.",
+  "Swept nearly every Game of the Year award in 2022 and sold over 20 million copies in its first year."
+]},
+  {id:"darksouls3",title:"Dark Souls 3",ready:true, clues: [
+  "RPG infamous for its brutal difficulty.",
+  "Released in 2016.",
+  "Set in a dark medieval world on the verge of total collapse.",
+  "Every enemy can kill you in a few hits.",
+  "The game is filled with cryptic lore hidden entirely in item descriptions and environmental details.",
+  "The final entry in its trilogy, it brings back locations and characters from the very first game."
+]},
+  {id:"rocketleague",title:"Rocket League",ready:true, clues: [
+  "A competitive multiplayer game that mashes two completely different sports together.",
+  "Released in 2015.",
+  "You are able to control a vehicle.",
+  "The objective is simple, put the ball in the other team's net.",
+  "The skill ceiling is so high that top players perform aerial maneuvers that look physically impossible.",
+  "Went free-to-play in 2020 after being acquired by Epic Games, instantly tripling its player base."
+]},
+  {id:"mariokart",title:"Mario Kart",ready:true, clues: [
+  "Features a plethora of Nintendo characters.",
+  "The first entry released in 1992.",
+  "Maps are themed around iconic Nintendo worlds and locations.",
+  "Players collect item boxes mid-race to sabotage opponents.",
+  "One item is so hated it has its own meme, it always seems to hit you right before the finish line.",
+  "The latest entry sold over 60 million copies, making it the best-selling racing game of all time."
+]},
+  {id:"cyberpunk2077",title:"Cyberpunk 2077",ready:true, clues: [
+  "An open world RPG set in a dystopian future.",
+  "Released in 2020.",
+  "Set in a sprawling neon-lit megacity where corporations control everything.",
+  "You play a mercenary who can customize their body with cybernetic implants.",
+  "A famous actor was cast as a major character and their likeness was used in the game.",
+  "Developed by CD Projekt Red, its launch was so buggy it was pulled from the PlayStation Store for months."
+]},
+  {id:"minecraft",title:"Minecraft",ready:true, clues: [
+  "A sandbox game with no set objectives or end goal.",
+  "Released in 2011.",
+  "The world is made entirely of blocks.",
+  "You gather resources during the day and survive against creatures at night.",
+  "Features two distinct modes — one where you can't respawn, and one where you have unlimited resources.",
+  "Created by Markus \"Notch\" Persson and later sold to Microsoft for $2.5 billion."
+]},
   {id:"terraria",title:"Terraria",ready:false},
   {id:"stardewvalley",title:"Stardew Valley",ready:false},
   {id:"hollowknight",title:"Hollow Knight",ready:false},
@@ -115,7 +200,6 @@ const GAMES=[
   {id:"deltarune",title:"Deltarune",ready:false},
   {id:"cuphead",title:"Cuphead",ready:false}
 ];
-
 const DAILY_SCHEDULE={
   "2026-06-20":"halo",
   "2026-06-21":"balatro",
