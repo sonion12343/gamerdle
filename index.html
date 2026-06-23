@@ -61,6 +61,14 @@ h1{font-size:26px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
 .infinite-badge{display:none;text-align:center;margin-bottom:1rem;}
 .infinite-badge span{background:#1d4ed8;color:#fff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;}
 #round-info{text-align:center;font-size:12px;color:#666;margin-bottom:1rem;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:1.5rem;max-width:420px;width:90%;position:relative;}
+.modal h2{font-size:17px;font-weight:600;margin-bottom:1rem;}
+.modal p{font-size:13px;color:#ccc;line-height:1.7;margin-bottom:.5rem;}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#999;font-size:20px;cursor:pointer;line-height:1;}
+.modal-close:hover{color:#fff;}
+
 </style>
 </head>
 <body>
@@ -70,7 +78,21 @@ h1{font-size:26px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
   <div class="mode-bar">
     <button class="mode-btn active" id="daily-btn" onclick="setMode('daily')">Daily</button>
     <button class="mode-btn" id="infinite-btn" onclick="setMode('infinite')">Infinite</button>
+    <button class="mode-btn" onclick="document.getElementById('modal').classList.add('open')">How to play</button>
   </div>
+  <div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+    <h2>How to play</h2>
+    <p>Guess the video game in 6 clues or fewer.</p>
+    <p>Each wrong guess or skip reveals the next clue.</p>
+    <p>🟩 Green slot — correct guess</p>
+    <p>🟥 Red slot — wrong guess</p>
+    <p>🟨 Yellow slot — skipped</p>
+    <p>Clues go from vague to specific — the fewer you need, the better!</p>
+    <p>A new daily puzzle drops every day. Play infinite mode for unlimited rounds.</p>
+  </div>
+</div>
   <div class="infinite-badge" id="inf-badge"><span>∞ Infinite Mode</span></div>
   <div id="round-info"></div>
   <div id="game-area">
