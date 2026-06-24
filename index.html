@@ -43,6 +43,9 @@ h1{font-size:50px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
 #skip-btn{padding:10px 18px;font-size:14px;font-weight:500;border-radius:8px;background:#1a1a1a;border:1px solid #333;color:#999;cursor:pointer;}
 #skip-btn:hover{background:#252525;}
 #skip-btn:disabled{opacity:.4;cursor:default;}
+#giveup-btn{padding:10px 18px;font-size:14px;font-weight:500;border-radius:8px;background:#1a1a1a;border:1px solid #333;color:#666;cursor:pointer;}
+#giveup-btn:hover{background:#252525;}
+#giveup-btn:disabled{opacity:.4;cursor:default;}
 #err{font-size:12px;color:#f87171;text-align:center;margin-top:6px;display:none;}
 #result{display:none;margin-top:1rem;border-radius:10px;overflow:hidden;border:1px solid #2a2a2a;}
 #result-top{padding:1rem 1.25rem;text-align:center;}
@@ -79,6 +82,7 @@ h1{font-size:50px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
     <button class="mode-btn active" id="daily-btn" onclick="setMode('daily')">Daily</button>
     <button class="mode-btn" id="infinite-btn" onclick="setMode('infinite')">Infinite</button>
     <button class="mode-btn" onclick="document.getElementById('modal').classList.add('open')">How to play</button>
+    <button id="giveup-btn" onclick="giveUp()">Give up</button>
   </div>
   <div class="modal-overlay" id="modal">
   <div class="modal">
@@ -216,9 +220,30 @@ const GAMES=[
   "Created by Markus \"Notch\" Persson and later sold to Microsoft for $2.5 billion."
 ]},
   {id:"terraria",title:"Terraria",ready:false},
-  {id:"stardewvalley",title:"Stardew Valley",ready:false},
-  {id:"hollowknight",title:"Hollow Knight",ready:false},
-  {id:"celeste",title:"Celeste",ready:false},
+  {id:"stardewvalley",title:"Stardew Valley",ready:true, clues: [
+  "A farming simulator.",
+  "Released in 2016.",
+  "You inherit a rundown farm from your grandfather and slowly restore it.",
+  "Beyond farming, you can mine, fish, fight monsters, and build relationships with townspeople.",
+  "Features a full relationship and marriage system with the villagers.",
+  "One of the most successful solo indie projects ever made."
+]},
+  {id:"hollowknight",title:"Hollow Knight",ready:true, clues: [
+  "An action platformer.",
+  "Released in 2017.",
+  "You explore a ruined insect civilization buried beneath a forgotten town.",
+  "The world is enormous and almost entirely non-linear.",
+  "Combat is precise and punishing, with a mechanic that lets you heal by landing hits on enemies.",
+  "Developed by a three-person studio called Team Cherry, it started as a Kickstarter project."
+]},
+  {id:"celeste",title:"Celeste",ready:true, clues: [
+  "A 2D platformer.",
+  "Released in 2018.",
+  "You play as a young woman attempting to climb a mysterious and treacherous mountain.",
+  "The game is brutally difficult.",
+  "The mountain serves as a metaphor, the story deals openly with anxiety and mental health.",
+  "Won several Game of the Year awards and is considered one of the greatest indie games ever made."
+]},
   {id:"hades",title:"Hades",ready:false},
   {id:"undertale",title:"Undertale",ready:false},
   {id:"deltarune",title:"Deltarune",ready:false},
@@ -303,7 +328,14 @@ const GAMES=[
   "The entire game is presented as a single unbroken camera shot with no cuts or load screens.",
   "Won Game of the Year at The Game Awards 2018 and is widely considered one of the greatest games ever made."
 ]},
-  {id:"godofwarragnorok",title:"God of War: Ragnarök",ready:false},
+  {id:"godofwarragnorok",title:"God of War: Ragnarök",ready:true, clues: [
+  "An action adventure game.",
+  "Released in 2022.",
+  "The two protagonists travel across Norse realms.",
+  "Combat expands on its predecessor with new weapons, abilities, and a more active companion system.",
+  "Features an emotionally complex father-son narrative.",
+  "Considered one of the best PlayStation exclusives ever made."
+]},
   {id:"thelastofus",title:"The Last of Us",ready:true, clues: [
   "A third person action adventure.",
   "Released in 2013.",
@@ -312,11 +344,47 @@ const GAMES=[
   "The relationship between the two main characters drives the entire emotional weight of the game.",
   "Later became an acclaimed HBO series."
 ]},
-  {id:"thelastofus2",title:"The Last of Us Part II",ready:false},
-  {id:"ghostoftsushima",title:"Ghost of Tsushima",ready:false},
-  {id:"residentevil4",title:"Resident Evil 4",ready:false},
-  {id:"metalgearsolid",title:"Metal Gear Solid",ready:false},
-  {id:"roblox",title:"Roblox",ready:false},
+  {id:"thelastofus2",title:"The Last of Us Part II",ready:true, clues: [
+  "A third person action adventure.",
+  "Released in 2020.",
+  "Picks up several years after the first game with a older version of the teenage girl as the protagonist.",
+  "The story is told from multiple perspectives, including that of a character the player is meant to hate.",
+  "One of the most divisive games ever made.",
+  "Won more Game of the Year awards than any other game in history."
+]},
+  {id:"ghostoftsushima",title:"Ghost of Tsushima",ready:true, clues: [
+  "Set in Japan.",
+  "Released in 2020.",
+  "Based on real events.",
+  "You play as a samurai who must abandon his code of honor to fight as a warrior.",
+  "Features a stunning art style with dynamic weather, wind-blown grass, and golden forests.",
+  "Developed by Sucker Punch, best known for the inFamous series."
+]},
+  {id:"residentevil4",title:"Resident Evil 4",ready:true, clues: [
+  "A third person survival game.",
+  "Released in 2005, with a full remake in 2023.",
+  "Set in rural Spain, the protagonist is sent to rescue the US President's kidnapped daughter.",
+  "Enemies are not zombies but mind-controlled villagers.",
+  "Introduced an over-the-shoulder camera that became the standard for third person shooters.",
+  "Widely considered one of the greatest games ever made and the best entry in its franchise."
+]},
+  {id:"metalgearsolid",title:"Metal Gear Solid",ready:true, clues: [
+  "A stealth action game.",
+  "Released in 1998.",
+  "Set on a remote Alaskan nuclear disposal facility.",
+  "The protagonist infiltrates the base alone, relying on sneaking, distraction, and camouflage.",
+  "Features one of gaming's most infamous boss fights, one that requires the player to check the back of the game case.",
+  "Created by Hideo Kojima, who became one of the most celebrated and eccentric auteurs in game history."
+]},
+
+  {id:"roblox",title:"Roblox",ready:true, clues: [
+  "A multiplayer game.",
+  "Released in 2006.",
+  "Players can create and publish their own games within the game.",
+  "The game is free.",
+  "Has its own virtual currency used to buy items and access certain games.",
+  "Despite looking simple, it has over 70 million daily active users and is more popular with kids than any other platform."
+]},
 
 ];
 const DAILY_SCHEDULE={
@@ -375,6 +443,8 @@ function startGame(){
   document.getElementById('skip-btn').disabled=false;
   document.getElementById('no-puzzle').style.display='none';
   document.getElementById('game-area').style.display='block';
+  document.getElementById('giveup-btn').disabled=false;
+}
 
   if(mode==='daily'){
     const key=getTodayKey();
@@ -439,6 +509,7 @@ function endGame(won){
   document.getElementById('s-clues').textContent=clueIdx+1;
   document.getElementById('s-skips').textContent=skips;
   document.getElementById('result').style.display='block';
+  document.getElementById('giveup-btn').disabled=true; #thisrighthere
   if(mode==='infinite')document.getElementById('next-btn').style.display='block';
 }
 
@@ -463,6 +534,12 @@ function skipGuess(){
   const sl=document.getElementById('s'+(gc-1));if(sl)sl.className='slot s';
   document.getElementById('inp').value='';document.getElementById('drop').style.display='none';document.getElementById('err').style.display='none';
   advance();
+}
+  
+function giveUp(){
+  if(over)return;
+  gc=6;
+  endGame(false);
 }
 
 function nextRound(){startGame();}
