@@ -509,7 +509,7 @@ function endGame(won){
   document.getElementById('s-clues').textContent=clueIdx+1;
   document.getElementById('s-skips').textContent=skips;
   document.getElementById('result').style.display='block';
-  document.getElementById('giveup-btn').disabled=true;
+  document.getElementById('giveup-btn').disabled=false;
   if(mode==='infinite')document.getElementById('next-btn').style.display='block';
 }
 
