@@ -14,6 +14,12 @@ h1{font-size:50px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
 .mode-bar{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem;}
 .mode-btn{padding:6px 16px;font-size:13px;font-weight:500;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:#999;cursor:pointer;}
 .mode-btn.active{background:#1d4ed8;border-color:#1d4ed8;color:#fff;}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:13px;}
+.dist-label{width:12px;color:#999;text-align:right;}
+.dist-bar-wrap{flex:1;background:#2a2a2a;border-radius:3px;height:20px;overflow:hidden;}
+.dist-bar{height:100%;background:#1d4ed8;border-radius:3px;min-width:4px;display:flex;align-items:center;padding-left:6px;font-size:12px;color:#fff;transition:width .4s;}
+.stats-grid{display:flex;gap:8px;margin-bottom:1.25rem;}
+.stats-grid .stat{flex:1;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:.75rem;text-align:center;}
 #clues-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
 .clue-item{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:.75rem 1rem;}
 .clue-item.active{border-color:#3b82f6;background:#111827;}
@@ -71,7 +77,7 @@ h1{font-size:50px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
 .modal p{font-size:13px;color:#ccc;line-height:1.7;margin-bottom:.5rem;}
 .modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#999;font-size:20px;cursor:pointer;line-height:1;}
 .modal-close:hover{color:#fff;}
-
+ 
 </style>
 </head>
 <body>
@@ -82,6 +88,7 @@ h1{font-size:50px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
     <button class="mode-btn active" id="daily-btn" onclick="setMode('daily')">Daily</button>
     <button class="mode-btn" id="infinite-btn" onclick="setMode('infinite')">Infinite</button>
     <button class="mode-btn" onclick="document.getElementById('modal').classList.add('open')">How to play</button>
+    <button class="mode-btn" onclick="openStats()">Stats</button>
   </div>
   <div class="modal-overlay" id="modal">
   <div class="modal">
@@ -95,9 +102,23 @@ h1{font-size:50px;font-weight:700;text-align:center;margin-bottom:4px;letter-spa
     <p>Clues go from vague to specific — the fewer you need, the better!</p>
     <p>A new daily puzzle drops every day. Play infinite mode for unlimited rounds.</p>
     <p style="text-align:center;font-size:12px;color:#7d7d7d;margin-top:2rem;">made by <a href="https://www.instagram.com/jwelshyy/?hl=en" target="_blank" style="color:#999999;">J.J. Welsh</a></p>
-
+ 
   </div>
 </div>
+  <div class="modal-overlay" id="stats-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="document.getElementById('stats-modal').classList.remove('open')">✕</button>
+      <h2>Your Stats</h2>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-val" id="st-played">0</div><div class="stat-label">Played</div></div>
+        <div class="stat"><div class="stat-val" id="st-winpct">0%</div><div class="stat-label">Win %</div></div>
+        <div class="stat"><div class="stat-val" id="st-streak">0</div><div class="stat-label">Streak</div></div>
+        <div class="stat"><div class="stat-val" id="st-best">0</div><div class="stat-label">Best</div></div>
+      </div>
+      <p style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#666;margin-bottom:8px;">Guess Distribution</p>
+      <div id="dist-bars"></div>
+    </div>
+  </div>
   <div class="infinite-badge" id="inf-badge"><span>∞ Infinite Mode</span></div>
   <div id="round-info"></div>
   <div id="game-area">
@@ -137,7 +158,7 @@ const GAMES=[
   "Players routinely achieve scores in the billions through ridiculous synergies.",
   "Developed solo by an anonymous developer known only as LocalThunk, who had never shipped a game before."
 ]},
-
+ 
   {id:"overwatch",title:"Overwatch",ready:true, clues: [
   "A hero shooter.",
   "Released in 2016.",
@@ -251,7 +272,7 @@ const GAMES=[
   "Every enemy can be spared through unique interactions, talking, joking, or acting out specific behaviors.",
   "Created entirely by one person, Toby Fox, who also composed the entire soundtrack himself."
 ]},
-
+ 
   {id:"cuphead",title:"Cuphead",ready:true, clues: [
   "Brutally difficult.",
   "Released in 2017.",
@@ -412,7 +433,7 @@ const GAMES=[
   "The story slowly reveals a cosmic horror layer beneath the surface that completely reframes the world.",
   "A PlayStation exclusive developed by FromSoftware."
 ]},
-
+ 
   {id:"demonsouls",title:"Demon Souls",ready:true, clues: [
   "A punishing action RPG.",
   "Originally released in 2009, with a full remake in 2020.",
@@ -517,7 +538,7 @@ const GAMES=[
   {id:"nba2k20",title:"NBA 2k20",ready:false},
   {id:"mlbtheshow20",title:"MLB: The Show 20",ready:false},
   {id:"ncaafootball14",title:"NCAA Football 14",ready:false},
-
+ 
 ];
 const DAILY_SCHEDULE={
   "2026-06-20":"roblox",
@@ -531,18 +552,18 @@ const DAILY_SCHEDULE={
   "2026-06-28":"overwatch",
   "2026-06-29":"darksouls3"
 };
-
+ 
 const LIST=GAMES.map(g=>g.title);
 const GAME_MAP=Object.fromEntries(GAMES.map(g=>[g.id,g]));
-
+ 
 let mode='daily';
 let puzzle=null;
 let clueIdx=0,gc=0,skips=0,over=false,si=-1,filt=[];
 let infiniteRound=0;
 let usedInfinite=[];
-
+ 
 function getTodayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-
+ 
 function setMode(m){
   mode=m;
   document.getElementById('daily-btn').classList.toggle('active',m==='daily');
@@ -553,14 +574,14 @@ function setMode(m){
   infiniteRound=0;
   startGame();
 }
-
+ 
 function pickInfiniteGame(){
   const pool=GAMES.filter(g=>g.ready!==false);
   const available=pool.filter(g=>!usedInfinite.includes(g.id));
   if(!available.length){usedInfinite=[];return pool[Math.floor(Math.random()*pool.length)];}
   return available[Math.floor(Math.random()*available.length)];
 }
-
+ 
 function startGame(){
   clueIdx=0;gc=0;skips=0;over=false;si=-1;filt=[];
   document.getElementById('clues-list').innerHTML='';
@@ -576,8 +597,8 @@ function startGame(){
   document.getElementById('no-puzzle').style.display='none';
   document.getElementById('game-area').style.display='block';
   document.getElementById('giveup-btn').disabled=false;
-
-
+ 
+ 
   if(mode==='daily'){
     const key=getTodayKey();
     const id=DAILY_SCHEDULE[key];
@@ -591,11 +612,11 @@ function startGame(){
     puzzle=g;
     document.getElementById('round-info').textContent='Round '+infiniteRound;
   }
-
+ 
   for(let i=0;i<6;i++){const s=document.createElement('div');s.className='slot';s.id='s'+i;document.getElementById('slots').appendChild(s);}
   renderClues();
 }
-
+ 
 function renderClues(){
   const cl=document.getElementById('clues-list');
   cl.innerHTML='';
@@ -607,7 +628,7 @@ function renderClues(){
   }
   cl.lastChild.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-
+ 
 function showDrop(v){
   const err=document.getElementById('err');err.style.display='none';
   const drop=document.getElementById('drop');
@@ -619,14 +640,14 @@ function showDrop(v){
   si=-1;drop.style.display='block';
 }
 function updActive(){document.getElementById('drop').querySelectorAll('.di').forEach((el,i)=>el.classList.toggle('a',i===si));}
-
+ 
 function addRow(text,type){
   const r=document.createElement('div');r.className='row '+type;
   const ic=document.createElement('i');ic.className=type==='c'?'ti ti-check':type==='s'?'ti ti-player-skip-forward':'ti ti-x';
   r.appendChild(ic);const sp=document.createElement('span');sp.textContent=text;r.appendChild(sp);
   document.getElementById('rows').appendChild(r);
 }
-
+ 
 function endGame(won){
   over=true;
   document.getElementById('inp').disabled=true;
@@ -641,12 +662,13 @@ function endGame(won){
   document.getElementById('s-clues').textContent=clueIdx+1;
   document.getElementById('s-skips').textContent=skips;
   document.getElementById('result').style.display='block';
+  recordResult(won, gc);
   document.getElementById('giveup-btn').disabled=false;
   if(mode==='infinite')document.getElementById('next-btn').style.display='block';
 }
-
+ 
 function advance(){if(gc>=6){endGame(false);return;}if(clueIdx<5){clueIdx++;renderClues();}}
-
+ 
 function submitGuess(){
   if(over)return;
   const v=document.getElementById('inp').value.trim();if(!v)return;
@@ -659,7 +681,7 @@ function submitGuess(){
   if(ok){endGame(true);return;}
   advance();
 }
-
+ 
 function skipGuess(){
   if(over)return;gc++;skips++;
   addRow('Skipped','s');
@@ -673,9 +695,9 @@ function giveUp(){
   gc=6;
   endGame(false);
 }
-
+ 
 function nextRound(){startGame();}
-
+ 
 document.getElementById('inp').addEventListener('input',()=>showDrop(document.getElementById('inp').value));
 document.getElementById('inp').addEventListener('blur',()=>setTimeout(()=>document.getElementById('drop').style.display='none',150));
 document.getElementById('inp').addEventListener('keydown',e=>{
@@ -686,8 +708,39 @@ document.getElementById('inp').addEventListener('keydown',e=>{
 });
 document.getElementById('btn').addEventListener('click',submitGuess);
 document.getElementById('skip-btn').addEventListener('click',skipGuess);
-
+ 
+function loadStats(){const s=localStorage.getItem('gamerdle_stats');return s?JSON.parse(s):{played:0,wins:0,streak:0,best:0,dist:{1:0,2:0,3:0,4:0,5:0,6:0}};}
+function saveStats(s){localStorage.setItem('gamerdle_stats',JSON.stringify(s));}
+function recordResult(won,guesses){
+  if(mode!=='daily')return;
+  const today=getTodayKey();
+  if(localStorage.getItem('gamerdle_played_'+today))return;
+  localStorage.setItem('gamerdle_played_'+today,'1');
+  const s=loadStats();
+  s.played++;
+  if(won){s.wins++;s.streak++;s.best=Math.max(s.best,s.streak);s.dist[guesses]=(s.dist[guesses]||0)+1;}
+  else{s.streak=0;}
+  saveStats(s);
+}
+function openStats(){
+  const s=loadStats();
+  document.getElementById('st-played').textContent=s.played;
+  document.getElementById('st-winpct').textContent=s.played?Math.round(s.wins/s.played*100)+'%':'0%';
+  document.getElementById('st-streak').textContent=s.streak;
+  document.getElementById('st-best').textContent=s.best;
+  const max=Math.max(1,...Object.values(s.dist));
+  const bars=document.getElementById('dist-bars');
+  bars.innerHTML='';
+  for(let i=1;i<=6;i++){
+    const val=s.dist[i]||0;
+    const pct=Math.round(val/max*100);
+    bars.innerHTML+=`<div class="dist-row"><div class="dist-label">${i}</div><div class="dist-bar-wrap"><div class="dist-bar" style="width:${Math.max(4,pct)}%">${val}</div></div></div>`;
+  }
+  document.getElementById('stats-modal').classList.add('open');
+}
+ 
 startGame();
 </script>
 </body>
 </html>
+ 
